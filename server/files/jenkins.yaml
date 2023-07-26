@@ -1,0 +1,105 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n"
+  numExecutors: 1
+  scmCheckoutRetryCount: 2
+  mode: NORMAL
+  globalNodeProperties:
+  - envVars:
+      env:
+      - key: JENKINS_URL
+        value: "http://127.0.0.1:8080"
+  authorizationStrategy:
+    projectMatrix:
+      permissions:
+        - "GROUP:Agent/Build:authenticated"
+        - "GROUP:Agent/Configure:authenticated"
+        - "GROUP:Agent/Connect:authenticated"
+        - "GROUP:Agent/Create:authenticated"
+        - "GROUP:Agent/Delete:authenticated"
+        - "GROUP:Agent/Disconnect:authenticated"
+        - "GROUP:Credentials/Create:authenticated"
+        - "GROUP:Credentials/Delete:authenticated"
+        - "GROUP:Credentials/ManageDomains:authenticated"
+        - "GROUP:Credentials/Update:authenticated"
+        - "GROUP:Credentials/View:authenticated"
+        - "GROUP:Job/Build:authenticated"
+        - "GROUP:Job/Cancel:authenticated"
+        - "GROUP:Job/Configure:authenticated"
+        - "GROUP:Job/Create:authenticated"
+        - "GROUP:Job/Delete:authenticated"
+        - "GROUP:Job/Discover:authenticated"
+        - "GROUP:Job/Move:authenticated"
+        - "GROUP:Job/Read:authenticated"
+        - "GROUP:Job/Workspace:authenticated"
+        - "GROUP:Overall/Administer:authenticated"
+        - "GROUP:Overall/Read:authenticated"
+        - "GROUP:Run/Delete:authenticated"
+        - "GROUP:Run/Replay:authenticated"
+        - "GROUP:Run/Update:authenticated"
+        - "GROUP:View/Configure:authenticated"
+        - "GROUP:View/Create:authenticated"
+        - "GROUP:View/Delete:authenticated"
+        - "GROUP:View/Read:authenticated"
+  views:
+    - list:
+        name: "All jobs"
+        description: "All configured jobs"
+        includeRegex: ".*"
+        columns:
+          - "status"
+          - "buildButton"
+          - "jobName"
+          - "lastSuccess"
+          - "lastFailure"
+          - "gitBranchSpecifierColumn"
+          - "weather"
+          - "favoriteColumn"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: demo
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              id: "gh-credentials"
+              scope: GLOBAL
+              username: "${GH_USER}"
+              password: "${GH_PASS}"
+              description: "Github credentials"
+
+jobs:
+  - script: >
+      pipelineJob("Seed or update all pipelines") {
+        properties {
+          pipelineTriggers {
+            triggers {
+              githubPush()
+            }
+          }
+        }
+        definition {
+          cpsScm {
+            scm {
+              git {
+                extensions {
+                  cleanBeforeCheckout()
+                }
+                remote {
+                  url("https://github.com/danielduduta/flask-ci-jenkins.git")
+                }         
+                branch("*/main")
+              }
+            }
+          }
+        }
+      }
+
+security:
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+
