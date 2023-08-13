@@ -1,16 +1,39 @@
-def call(String name) {
+def call(String environment, String platform, String ttype) {
+
+    def ENVIRONMENT = environment
+    def PLATFORM = platform
+    def TTYPE = ttype
+    def app_repo = 'A'
+
+    if (PLATFORM == 'ios') {
+        app_repo = 'B'
+    }
+
     pipeline {
         agent any
         stages {
-            stage('Demo stage 1') {
+            stage('Checkout tests codebase') {
                 steps {
-                    sh 'echo demo stage 1'
+                    script {
+                        
+                    }
                 }
             }
-            stage('Demo stage 2') {
+            stage('Update app') {
                 steps {
-                    sh 'echo demo stage 2'
+                    sh "echo ${ENVIRONMENT}"
                 }
+            }
+            stage('Run tests') {
+                steps {
+                    sh "echo ${ENVIRONMENT}"
+                }
+            }
+        }
+        post {
+            always {
+                cleanWs()
+                // send notifications
             }
         }
     }
