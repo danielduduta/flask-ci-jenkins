@@ -61,44 +61,6 @@ jenkins:
         - id: admin
           password: demo
 
-credentials:
-  system:
-    domainCredentials:
-      - credentials:
-          - usernamePassword:
-              id: "gh-credentials"
-              scope: GLOBAL
-              username: "${GH_USER}"
-              password: "${GH_PASS}"
-              description: "Github credentials"
-
-jobs:
-  - script: >
-      pipelineJob("Seed or update all pipelines") {
-        properties {
-          pipelineTriggers {
-            triggers {
-              githubPush()
-            }
-          }
-        }
-        definition {
-          cpsScm {
-            scm {
-              git {
-                extensions {
-                  cleanBeforeCheckout()
-                }
-                remote {
-                  url("https://github.com/danielduduta/flask-ci-jenkins.git")
-                }         
-                branch("*/main")
-              }
-            }
-          }
-        }
-      }
-
 security:
   gitHostKeyVerificationConfiguration:
     sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"

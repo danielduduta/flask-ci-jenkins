@@ -10,8 +10,7 @@ RUN apt-get install -y docker-ce
 RUN usermod -aG docker jenkins
 
 # local issue
-RUN groupmod -g 996 docker
-RUN find /var/run -gid 999 -exec chgrp -v 996 '{}' \;
+RUN groupmod -g 1001 docker
 # end local issue
 
 RUN chown -R jenkins:jenkins /var/jenkins_home
@@ -24,6 +23,5 @@ ENV CASC_JENKINS_CONFIG /usr/share/jenkins/ref/jenkins.yaml
 ENV _BUILDAH_STARTED_IN_USERNS="" BUILDAH_ISOLATION=chroot
 COPY files/jenkins.yaml /usr/share/jenkins/ref/jenkins.yaml
 COPY files/InitialConfig.groovy /usr/share/jenkins/ref/init.groovy.d/InitialConfig.groovy
-COPY files/queue-seedjob.groovy /usr/share/jenkins/ref/init.groovy.d/queue-seedjob.groovy
 COPY files/plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
